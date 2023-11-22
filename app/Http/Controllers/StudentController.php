@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreStudentRequest;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -20,7 +22,7 @@ class StudentController extends Controller
      */
     public function create(Request $request)
     {
-        return view('dashboard.profile');
+
     }
 
     /**
@@ -28,7 +30,9 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $student_id = $request->student_id;
+        $student = Student::where('student_id',$student_id)->firstOrFail();
+        return view('dashboard.profile',['student' => $student]);
     }
 
     /**
@@ -50,9 +54,16 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(StoreStudentRequest $request, Student $student)
     {
-        //
+        $student->update([
+            'student_id' => $request->student_id,
+            'surname' => $request->surname,
+            'given_name' => $request->given_name,
+            'phone_number' => $request->phone_number,
+            'contact_number' => $request->contact_number
+        ]);
+        return view('dashboard.index');
     }
 
     /**

@@ -46,7 +46,9 @@
                 </div>
 
                 <div class="col-lg-8">
-                    <form action="{{ route('students.store') }}" method="POST">
+                    <form action="{{ route('students.update',$student->id) }}" method="POST">
+                        @csrf
+                        @method('put')
                         <div class="card mb-4">
                             <div class="card-body">
 
@@ -55,7 +57,7 @@
                                         <p class="mb-0">Talaba ID</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control mb-0 text-muted" value="223432">
+                                        <input type="text" class="form-control mb-0 text-muted" name="student_id" value="{{$student->student_id}}">
                                     </div>
                                 </div>
                                 <hr>
@@ -64,7 +66,7 @@
                                         <p class="mb-0">Familiyasi</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control mb-0 text-muted" value="Abdullayev">
+                                        <input type="text" class="form-control mb-0 text-muted" name="surname" value="{{$student->surname}}">
                                     </div>
                                 </div>
                                 <hr>
@@ -73,7 +75,7 @@
                                         <p class="mb-0">Ismi</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control mb-0 text-muted" value="Alisher">
+                                        <input type="text" class="form-control mb-0 text-muted" name="given_name" value="{{$student->given_name}}">
                                     </div>
                                 </div>
                                 <hr>
@@ -82,7 +84,7 @@
                                         <p class="mb-0">Telefon raqami</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control mb-0 text-muted" value="+998 99 990-55-18">
+                                        <input type="text" class="form-control mb-0 text-muted" name="phone_number" value="{{$student->phone_number}}">
                                     </div>
                                 </div>
                                 <hr>
@@ -91,7 +93,7 @@
                                         <p class="mb-0">Ota-onasining telefon raqami</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control mb-0 text-muted" value="+998 99 990-55-18">
+                                        <input type="text" class="form-control mb-0 text-muted" name="contact_number" value="{{$student->contact_number}}">
                                     </div>
                                 </div>
                                 <hr>

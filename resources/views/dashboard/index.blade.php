@@ -11,11 +11,12 @@
 </head>
 
 <body>
-    <form action="{{ route('students.create') }}">
+    <form method="post" action="{{ route('students.store') }}">
+        @csrf
         <div class="container d-flex flex-column gap-2 align-items-center justify-content-center min-vh-100">
             <div style="width: 300px">
                 <label for="student_id" class="form-label d-block text-center fw-bolder">Talaba ID</label>
-                <input type="text" class="form-control" id="student_id" autocomplete="off">
+                <input type="text" class="form-control" id="student_id" name="student_id">
             </div>
             <div style="width: 300px">
                 <input type="submit" class="form-control btn btn-primary" value="Qidirish">
