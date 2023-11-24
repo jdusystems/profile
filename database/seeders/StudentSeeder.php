@@ -24,7 +24,7 @@ class StudentSeeder extends Seeder
             $surname = $parts[0];
             Student::updateOrCreate(
                 [
-                    'studentId' => $student->id,
+                    'student_id' => $student->id,
                 ],
                 [
                     'surname' => $surname,
@@ -46,7 +46,7 @@ class StudentSeeder extends Seeder
             $surname = $parts[0];
             Student::updateOrCreate(
                 [
-                    'studentId' => $student->id,
+                    'student_id' => $student->id,
                 ],
                 [
                     'surname' => $surname,
@@ -66,7 +66,7 @@ class StudentSeeder extends Seeder
             $surname = $parts[0];
             Student::updateOrCreate(
                 [
-                    'studentId' => $student->id,
+                    'student_id' => $student->id,
                 ],
                 [
                     'surname' => $surname,
@@ -87,7 +87,7 @@ class StudentSeeder extends Seeder
             $surname = $parts[0];
             Student::updateOrCreate(
                 [
-                    'studentId' => $student->id,
+                    'student_id' => $student->id,
                 ],
                 [
                     'surname' => $surname,
@@ -107,7 +107,7 @@ class StudentSeeder extends Seeder
             $surname = $parts[0];
             Student::updateOrCreate(
                 [
-                    'studentId' => $student->id,
+                    'student_id' => $student->id,
                 ],
                 [
                     'surname' => $surname,
@@ -127,7 +127,7 @@ class StudentSeeder extends Seeder
             $surname = $parts[0];
             Student::updateOrCreate(
                 [
-                    'studentId' => $student->id,
+                    'student_id' => $student->id,
                 ],
                 [
                     'surname' => $surname,
