@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <form method="post" action="{{ route('students.store') }}">
+    <form method="post" action="{{ route('talaba.top') }}">
         @csrf
         <div class="container d-flex flex-column gap-2 align-items-center justify-content-center min-vh-100">
             <div style="width: 300px">
