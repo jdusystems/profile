@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>JDU</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
@@ -44,13 +44,13 @@
                     <div class="card mb-4">
                         <div class="card-body text-center">
                             <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
-                                alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                                id="user_avatar" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
                             <h5 class="my-3">Abdullayev Alisher</h5>
                             <p class="text-muted mb-1">Full Stack Developer</p>
                             <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
                             <div class="d-flex justify-content-center mb-2">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#staticBackdrop">Rasmga olish</button>
+                                    data-bs-target="#modalForCapturing">Rasmga olish</button>
                             </div>
                         </div>
                     </div>
@@ -59,8 +59,8 @@
 
 
                 {{-- Modal for capturing photo section start --}}
-                <div class="modal modal-lg fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
-                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal modal-lg fade" id="modalForCapturing" data-bs-backdrop="static"
+                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -70,23 +70,23 @@
                             </div>
                             <div class="modal-body">
                                 <div class="container-fluid">
-                                        <div id="video-container d-flex align-items-center justify-content-center">
-                                            <video id="video" autoplay playsinline></video>
-                                            <button type="button" onclick="capturePhoto()">Capture Photo</button>
-                                        </div>
+                                    <div id="video-container" class="d-flex align-items-center justify-content-center flex-column gap">
+                                        <video id="video" autoplay playsinline width="100%"></video>
+                                        <button type="button" onclick="capturePhoto()" class="btn btn-warning mt-4">Capture
+                                            Photo</button>
+                                        {{-- <button type="button" onclick="stopCapture()" class="btn btn-danger">Stop --}}
+                                            {{-- Capturing</button> --}}
+                                    </div>
 
-                                        <img id="captured-photo" alt="Captured Photo">
-                                        <input type="file" id="upload-input" name="file" style="display: none;">
+                                    {{-- <img id="captured-photo" alt="Captured Photo"> --}}
+                                    {{-- <input type="file" id="upload-input" name="file" style="display: none;"> --}}
 
-                                        <a id="download-link" style="display: none;">Download Photo</a>
-
-                                        <button type="submit">Upload Photo</button>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Understood</button>
-                            </div>
+                            {{-- <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
+                                <button type="button" class="btn btn-primary">Rasmga olish</button>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
@@ -176,7 +176,7 @@
         </div>
     </section>
 
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
     </script>
@@ -210,13 +210,19 @@
 
 
         // CAMERA CAPTURING SECTION START
+
+        const myModal = document.getElementById('modalForCapturing')
+
+        myModal.addEventListener('shown.bs.modal', function() {
+            console.log("Working...");
+        })
+
         console.log("Script is running");
         const video = document.getElementById('video');
-        console.log(video);
         const capturedPhoto = document.getElementById('captured-photo');
-        console.log(capturePhoto);
         const uploadInput = document.getElementById('upload-input');
-        console.log(uploadInput);
+        const userAvatar = document.getElementById('user_avatar');
+
         let stream;
 
         const constraints = {
@@ -239,32 +245,61 @@
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
 
-                // Set the canvas dimensions to the video stream dimensions
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+                // Set the canvas dimensions to a square shape
+                const size = Math.min(video.videoWidth, video.videoHeight);
+                canvas.width = size;
+                canvas.height = size;
+
+                // Calculate the cropping position to center the square
+                const x = (video.videoWidth - size) / 2;
+                const y = (video.videoHeight - size) / 2;
+
 
                 // Draw the current frame from the video stream onto the canvas
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                context.drawImage(video, x, y, size, size, 0, 0, size, size);
 
                 // Convert the canvas content to a data URL representing the image
                 const dataUrl = canvas.toDataURL('image/png');
 
                 // Display the captured photo
-                capturedPhoto.src = dataUrl;
-                capturedPhoto.style.display = 'block';
+                // capturedPhoto.src = dataUrl;
+                // capturedPhoto.style.display = 'block';
 
                 // Display and enable the download link
-                downloadLink.href = dataUrl;
-                downloadLink.style.display = 'inline';
-                downloadLink.download = 'captured_photo.png'; // specify the filename for download
+                // downloadLink.href = dataUrl;
+                // downloadLink.style.display = 'inline';
+                // downloadLink.download = 'captured_photo.png'; // specify the filename for download
 
                 // Set the value of the upload input to the data URL
-                uploadInput.value = dataUrl;
+                // uploadInput.value = dataUrl;
+                // Set the value of the user avatar
+                userAvatar.src = dataUrl;
 
                 // Optionally, you can save the data URL or perform other actions here
                 // For example, you can send the dataUrl to a server for further processing
+                myModal.hide();
             } else {
                 alert('Camera stream not available. Make sure the camera is accessible.');
+            }
+        }
+
+        function stopCapture() {
+            if (stream) {
+                const tracks = stream.getTracks();
+
+                tracks.forEach(track => {
+                    track.stop();
+                });
+
+                if (videoElement) {
+                    videoElement.srcObject = null;
+                    videoElement.remove();
+                    videoElement = null;
+                }
+
+                stream = null;
+            } else {
+                alert('No capture stream to stop.');
             }
         }
         // CAMERA CAPTURING SECTION END
