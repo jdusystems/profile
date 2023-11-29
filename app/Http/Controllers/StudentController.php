@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreStudentRequest;
 use App\Models\Student;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +23,6 @@ class StudentController extends Controller
      */
     public function create(Request $request)
     {
-
     }
 
     /**
@@ -31,8 +31,8 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $student_id = $request->student_id;
-        $student = Student::where('student_id',$student_id)->firstOrFail();
-        return view('dashboard.profile',['student' => $student]);
+        $student = Student::where('student_id', $student_id)->firstOrFail();
+        return view('dashboard.profile', ['student' => $student]);
     }
 
     /**
@@ -72,5 +72,47 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         //
+    }
+
+    public function imageUpload(Request $request)
+    {
+
+
+        $imageDataUrl = $request->input('image');
+        $studentId = $request->input('studentId');
+
+        // return response()->json(['result' => $imageDataUrl]);
+
+
+
+
+
+        // Decode the data URL and save the image
+        list($type, $data) = explode(';', $imageDataUrl);
+        list(, $data)      = explode(',', $data);
+        $decodedImage = base64_decode($data);      
+        
+        // Save the image to a storage location
+        $imageName = $studentId . '.png';
+        try {
+            if (!file_exists(public_path("images/"))) {
+                mkdir(public_path("images/"), 666, true);
+            }
+            file_put_contents(public_path("images/" . $imageName), $decodedImage);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Validation failed',
+                'errors' => $e->getMessage(),
+            ], 422);
+        }
+
+        // You can save the image information to the database if needed
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Image uploaded successfully',
+            'imageName' => $imageName
+        ]);
     }
 }

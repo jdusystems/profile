@@ -36,3 +36,4 @@ Route::middleware('auth')->group(function () {
     });
     Route::resource('/students', StudentController::class);
 });
+Route::post('/students/image', [StudentController::class, 'imageUpload'])->name('students.imageUpload');

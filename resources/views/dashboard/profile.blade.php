@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>JDU</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -70,12 +71,14 @@
                             </div>
                             <div class="modal-body">
                                 <div class="container-fluid">
-                                    <div id="video-container" class="d-flex align-items-center justify-content-center flex-column gap">
+                                    <div id="video-container"
+                                        class="d-flex align-items-center justify-content-center flex-column gap">
                                         <video id="video" autoplay playsinline width="100%"></video>
-                                        <button type="button" onclick="capturePhoto()" class="btn btn-warning mt-4">Capture
+                                        <button type="button" onclick="capturePhoto()"
+                                            class="btn btn-warning mt-4">Capture
                                             Photo</button>
                                         {{-- <button type="button" onclick="stopCapture()" class="btn btn-danger">Stop --}}
-                                            {{-- Capturing</button> --}}
+                                        {{-- Capturing</button> --}}
                                     </div>
 
                                     {{-- <img id="captured-photo" alt="Captured Photo"> --}}
@@ -93,7 +96,8 @@
                 {{-- Modal for capturing photo section end --}}
 
                 <div class="col-lg-8">
-                    <form action="{{ route('students.update', $student->id) }}" method="POST">
+                    <form action="{{ route('students.update', $student->id) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('put')
                         <div class="card mb-4">
@@ -104,7 +108,7 @@
                                         <p class="mb-0">Talaba ID</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control mb-0 text-muted" name="student_id"
+                                        <input type="text" id="student_id" class="form-control mb-0 text-muted" name="student_id"
                                             value="{{ $student->student_id }}">
                                     </div>
                                 </div>
@@ -160,6 +164,7 @@
                                     </div>
                                 </div>
                                 <hr>
+                               
                                 <div class="row mt-3">
                                     <div class="col-sm-4 d-flex align-items-center"></div>
                                     <div class="col-sm-8">
@@ -211,17 +216,17 @@
 
         // CAMERA CAPTURING SECTION START
 
-        const myModal = document.getElementById('modalForCapturing')
+        const myModal = new bootstrap.Modal(document.getElementById('modalForCapturing')); 
 
-        myModal.addEventListener('shown.bs.modal', function() {
-            console.log("Working...");
-        })
+        myModal.hide()
 
         console.log("Script is running");
         const video = document.getElementById('video');
         const capturedPhoto = document.getElementById('captured-photo');
         const uploadInput = document.getElementById('upload-input');
         const userAvatar = document.getElementById('user_avatar');
+        const studentImage = document.getElementById('student_image');
+        const studentId = document.getElementById('student_id');
 
         let stream;
 
@@ -273,7 +278,12 @@
                 // Set the value of the upload input to the data URL
                 // uploadInput.value = dataUrl;
                 // Set the value of the user avatar
-                userAvatar.src = dataUrl;
+                // studentImage.value = dataUrl;
+                
+                
+                sendImageToServer(dataUrl)
+
+                userAvatar.src = dataUrl
 
                 // Optionally, you can save the data URL or perform other actions here
                 // For example, you can send the dataUrl to a server for further processing
@@ -282,6 +292,33 @@
                 alert('Camera stream not available. Make sure the camera is accessible.');
             }
         }
+
+        function sendImageToServer(dataUrl) {
+            const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+
+            fetch('/students/image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        image: dataUrl,
+                        studentId: studentId.value
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    // console.log('Shu joy')
+                    return true;
+                })
+                .catch((error) => {
+                    console.error('Error sending image to server:', error);
+                    return false;
+                });
+        }
+
 
         function stopCapture() {
             if (stream) {
