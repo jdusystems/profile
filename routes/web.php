@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\PhoneNumberController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
+
 
 
 /*
@@ -35,5 +37,15 @@ Route::middleware('auth')->group(function () {
         return view('dashboard.index');
     });
     Route::resource('/students', StudentController::class);
+    Route::post('/students/image', [StudentController::class, 'imageUpload'])->name('students.imageUpload');
+
+    Route::post('/sendSms', [PhoneNumberController::class, 'sms'])->name('send.sms');
 });
-Route::post('/students/image', [StudentController::class, 'imageUpload'])->name('students.imageUpload');
+
+
+
+
+
+Route::get('/sendSms', function(){
+    return view('dashboard.test');
+});

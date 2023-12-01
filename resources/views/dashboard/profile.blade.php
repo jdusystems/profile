@@ -9,6 +9,8 @@
     <title>JDU</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <style>
         #video-container {
             max-width: 100%;
@@ -46,9 +48,9 @@
                         <div class="card-body text-center">
                             <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
                                 id="user_avatar" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
-                            <h5 class="my-3">Abdullayev Alisher</h5>
-                            <p class="text-muted mb-1">Full Stack Developer</p>
-                            <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
+                            <h5 class="my-3">{{ $student->given_name . ' ' . $student->surname }}</h5>
+                            <p class="text-muted mb-1">Talaba</p>
+                            <p class="text-muted mb-4">Japan Digital University</p>
                             <div class="d-flex justify-content-center mb-2">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#modalForCapturing">Rasmga olish</button>
@@ -108,8 +110,8 @@
                                         <p class="mb-0">Talaba ID</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" id="student_id" class="form-control mb-0 text-muted" name="student_id"
-                                            value="{{ $student->student_id }}">
+                                        <input type="text" id="student_id" class="form-control mb-0 text-muted"
+                                            name="student_id" value="{{ $student->student_id }}">
                                     </div>
                                 </div>
                                 <hr>
@@ -137,7 +139,7 @@
                                     <div class="col-sm-4 d-flex align-items-center">
                                         <p class="mb-0">Telefon raqami</p>
                                     </div>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-8 col-md-5">
                                         <div class="input-group flex-nowrap">
                                             <span class="input-group-text" id="addon-wrapping">+998</span>
                                             <input type="text" class="form-control mb-0 text-muted"
@@ -145,6 +147,27 @@
                                                 value="{{ $student->phone_number }}" required aria-label="Username"
                                                 aria-describedby="addon-wrapping" onkeyup="phoneNumberFormatter()">
                                         </div>
+                                    </div>
+                                    <div class="col-sm-12 mt-sm-2 col-md-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" id="sendSmsPhoneNumberButton"
+                                            class="btn btn-sm btn-primary">SMS
+                                            jo'natish</button>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 d-none" id="phoneNumberSmsConfirmationSection">
+                                    <div class="col-sm-4 d-flex align-items-center">
+                                        <p class="mb-0">Jo'natilgan sms ni kiriting</p>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="input-group flex-nowrap">
+                                            <input type="text" class="form-control form-control-sm mb-0 text-muted"
+                                                id="phone_number" name="phone_number"
+                                                value="{{ $student->phone_number }}" required aria-label="Username"
+                                                aria-describedby="addon-wrapping" onkeyup="phoneNumberFormatter()">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <button class="btn btn-sm btn-primary">Tasdiqlash</button>
                                     </div>
                                 </div>
                                 <hr>
@@ -164,7 +187,7 @@
                                     </div>
                                 </div>
                                 <hr>
-                               
+
                                 <div class="row mt-3">
                                     <div class="col-sm-4 d-flex align-items-center"></div>
                                     <div class="col-sm-8">
@@ -187,6 +210,18 @@
     </script>
 
     <script defer>
+        // Global variables
+        const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+        const video = document.getElementById('video');
+        const capturedPhoto = document.getElementById('captured-photo');
+        const uploadInput = document.getElementById('upload-input');
+        const userAvatar = document.getElementById('user_avatar');
+        const studentImage = document.getElementById('student_image');
+        const studentId = document.getElementById('student_id');
+        const sendSmsPhoneNumberButton = document.getElementById('sendSmsPhoneNumberButton');
+        const phoneNumberSmsConfirmationSection = document.getElementById('phoneNumberSmsConfirmationSection');
+        const phoneNumber = document.getElementById('phone_number');
+
         // PHONE NUMBER FORMATTER STARTS HERE
         function formatPhoneNumber(value) {
             if (!value) return value;
@@ -209,24 +244,48 @@
             const inputField = document.getElementById(event.target.id)
             const formattedInputValue = formatPhoneNumber(inputField.value)
             inputField.value = formattedInputValue;
-            console.log(formattedInputValue);
         }
         // PHONE NUMBER FORMATTER ENDS HERE
 
+        // SMS CONFIRMATION SECTION STARTS HERE
+        sendSmsPhoneNumberButton.addEventListener('click', async function(event) {
+            const filteredPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
+
+            fetch('/sendSms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        phone_number: phoneNumber
+                    }),
+                })
+                // .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    phoneNumberSmsConfirmationSection.classList.remove('d-none');
+                })
+                .catch((error) => {
+                    console.error('Error sending sms to server:', error);
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "error",
+                        title: "Tasdiqlash kodi noto'g'ri",
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                    return false;
+                });
+
+        })
+        // SMS CONFIRMATION SECTION ENDS HERE
 
         // CAMERA CAPTURING SECTION START
 
-        const myModal = new bootstrap.Modal(document.getElementById('modalForCapturing')); 
+        const myModal = new bootstrap.Modal(document.getElementById('modalForCapturing'));
 
         myModal.hide()
-
-        console.log("Script is running");
-        const video = document.getElementById('video');
-        const capturedPhoto = document.getElementById('captured-photo');
-        const uploadInput = document.getElementById('upload-input');
-        const userAvatar = document.getElementById('user_avatar');
-        const studentImage = document.getElementById('student_image');
-        const studentId = document.getElementById('student_id');
 
         let stream;
 
@@ -279,8 +338,8 @@
                 // uploadInput.value = dataUrl;
                 // Set the value of the user avatar
                 // studentImage.value = dataUrl;
-                
-                
+
+
                 sendImageToServer(dataUrl)
 
                 userAvatar.src = dataUrl
@@ -294,7 +353,6 @@
         }
 
         function sendImageToServer(dataUrl) {
-            const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
 
             fetch('/students/image', {
                     method: 'POST',
@@ -318,7 +376,6 @@
                     return false;
                 });
         }
-
 
         function stopCapture() {
             if (stream) {
