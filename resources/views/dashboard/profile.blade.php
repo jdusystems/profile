@@ -9,8 +9,6 @@
     <title>JDU</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <style>
         #video-container {
             max-width: 100%;
@@ -46,8 +44,8 @@
                 <div class="col-lg-4">
                     <div class="card mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ asset($photo_url) }}"
-                                id="user_avatar" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
+                            <img src="{{ asset($photo_url) }}" id="user_avatar" alt="avatar"
+                                class="rounded-circle img-fluid" style="width: 150px;">
                             <h5 class="my-3">{{ $student->given_name . ' ' . $student->surname }}</h5>
                             <p class="text-muted mb-1">Talaba</p>
                             <p class="text-muted mb-4">Japan Digital University</p>
@@ -200,6 +198,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script defer>
         // Global variables
@@ -214,6 +213,18 @@
         const phoneNumberSmsConfirmationSection = document.getElementById('phoneNumberSmsConfirmationSection');
         const phoneNumber = document.getElementById('phone_number');
 
+        // Toasts for notifications
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
         // PHONE NUMBER FORMATTER STARTS HERE
         function formatPhoneNumber(value) {
             if (!value) return value;
@@ -316,15 +327,6 @@
                 // Convert the canvas content to a data URL representing the image
                 const dataUrl = canvas.toDataURL('image/png');
 
-                // Display the captured photo
-                // capturedPhoto.src = dataUrl;
-                // capturedPhoto.style.display = 'block';
-
-                // Display and enable the download link
-                // downloadLink.href = dataUrl;
-                // downloadLink.style.display = 'inline';
-                // downloadLink.download = 'captured_photo.png'; // specify the filename for download
-
                 // Set the value of the upload input to the data URL
                 // uploadInput.value = dataUrl;
                 // Set the value of the user avatar
@@ -358,8 +360,10 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data);
-                    // console.log('Shu joy')
+                    Toast.fire({
+                        icon: "success",
+                        title: "Rasm muvaffaqiyatli saqlandi!"
+                    });
                     return true;
                 })
                 .catch((error) => {

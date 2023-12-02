@@ -85,12 +85,8 @@ class StudentController extends Controller
 
     public function imageUpload(Request $request)
     {
-
-
         $imageFile = $request->input('image');
         $studentId = $request->input('studentId');
-
-        // return response()->json(['result' => $imageFile]);
 
         // Decode the data URL and save the image
         list($type, $data) = explode(';', $imageFile);
@@ -101,14 +97,8 @@ class StudentController extends Controller
         // Save the image to a storage location
         $imageName = $studentId . '.png';
         try {
-
-            // Store the file in the storage/app/public/user-photos directory
+            // Store the file in the storage/app/public/images directory
             Storage::disk('public')->put('images/' . $imageName, $decodedImage);
-
-            // if (!file_exists(public_path("images/"))) {
-            //     mkdir(public_path("images/"), 666, true);
-            // }
-            // file_put_contents(public_path("images/" . $imageName), $decodedImage);
         } catch (Exception $e) {
             return response()->json([
                 'error' => true,
@@ -117,7 +107,7 @@ class StudentController extends Controller
             ], 422);
         }
 
-        // You can save the image information to the database if needed
+        // We can save the image information to the database if needed
 
         return response()->json([
             'success' => true,
