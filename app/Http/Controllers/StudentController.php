@@ -24,6 +24,7 @@ class StudentController extends Controller
      */
     public function create(Request $request)
     {
+        //
     }
 
     /**
@@ -33,7 +34,14 @@ class StudentController extends Controller
     {
         $student_id = $request->student_id;
         $student = Student::where('student_id', $student_id)->firstOrFail();
-        return view('dashboard.profile', ['student' => $student]);
+
+        if (Storage::disk('public')->exists("images/$request->student_id.png")) {
+            // Generate a public URL for the user's photo
+            $photoUrl = Storage::url("images/$request->student_id.png");
+        } else {
+            $photoUrl = "avatar.webp";
+        }
+        return view('dashboard.profile', ['student' => $student, 'photo_url' => $photoUrl]);
     }
 
     /**

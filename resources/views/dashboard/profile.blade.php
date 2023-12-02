@@ -46,7 +46,7 @@
                 <div class="col-lg-4">
                     <div class="card mb-4">
                         <div class="card-body text-center">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                            <img src="{{ asset($photo_url) }}"
                                 id="user_avatar" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
                             <h5 class="my-3">{{ $student->given_name . ' ' . $student->surname }}</h5>
                             <p class="text-muted mb-1">Talaba</p>
@@ -242,7 +242,7 @@
         // SMS CONFIRMATION SECTION STARTS HERE
         sendSmsPhoneNumberButton.addEventListener('click', function(event) {
             const filteredPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
-           
+
             fetch('/sendSms', {
                     method: 'POST',
                     headers: {
@@ -367,7 +367,7 @@
                     return false;
                 });
         }
-        
+
         // CAMERA CAPTURING SECTION END
     </script>
 </body>
