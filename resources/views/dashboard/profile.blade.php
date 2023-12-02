@@ -79,19 +79,10 @@
                                         <button type="button" onclick="capturePhoto()"
                                             class="btn btn-warning mt-4">Capture
                                             Photo</button>
-                                        {{-- <button type="button" onclick="stopCapture()" class="btn btn-danger">Stop --}}
-                                        {{-- Capturing</button> --}}
                                     </div>
-
-                                    {{-- <img id="captured-photo" alt="Captured Photo"> --}}
-                                    {{-- <input type="file" id="upload-input" name="file" style="display: none;"> --}}
 
                                 </div>
                             </div>
-                            {{-- <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
-                                <button type="button" class="btn btn-primary">Rasmga olish</button>
-                            </div> --}}
                         </div>
                     </div>
                 </div>
@@ -148,7 +139,8 @@
                                                 aria-describedby="addon-wrapping" onkeyup="phoneNumberFormatter()">
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 mt-sm-2 col-md-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                                    <div
+                                        class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-sm-end">
                                         <button type="button" id="sendSmsPhoneNumberButton"
                                             class="btn btn-sm btn-primary">SMS
                                             jo'natish</button>
@@ -161,7 +153,7 @@
                                     <div class="col-sm-4">
                                         <div class="input-group flex-nowrap">
                                             <input type="text" class="form-control form-control-sm mb-0 text-muted"
-                                                id="phone_number" name="phone_number"
+                                                id="confirmation_sms" name="phone_number"
                                                 value="{{ $student->phone_number }}" required aria-label="Username"
                                                 aria-describedby="addon-wrapping" onkeyup="phoneNumberFormatter()">
                                         </div>
@@ -248,9 +240,9 @@
         // PHONE NUMBER FORMATTER ENDS HERE
 
         // SMS CONFIRMATION SECTION STARTS HERE
-        sendSmsPhoneNumberButton.addEventListener('click', async function(event) {
+        sendSmsPhoneNumberButton.addEventListener('click', function(event) {
             const filteredPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
-
+           
             fetch('/sendSms', {
                     method: 'POST',
                     headers: {
@@ -258,10 +250,10 @@
                         'X-CSRF-TOKEN': csrfToken,
                     },
                     body: JSON.stringify({
-                        phone_number: phoneNumber
+                        phone_number: filteredPhoneNumber
                     }),
                 })
-                // .then(response => response.json())
+                .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
                     phoneNumberSmsConfirmationSection.classList.remove('d-none');
@@ -275,7 +267,6 @@
                         showConfirmButton: false,
                         timer: 1000
                     });
-                    return false;
                 });
 
         })
@@ -376,26 +367,7 @@
                     return false;
                 });
         }
-
-        function stopCapture() {
-            if (stream) {
-                const tracks = stream.getTracks();
-
-                tracks.forEach(track => {
-                    track.stop();
-                });
-
-                if (videoElement) {
-                    videoElement.srcObject = null;
-                    videoElement.remove();
-                    videoElement = null;
-                }
-
-                stream = null;
-            } else {
-                alert('No capture stream to stop.');
-            }
-        }
+        
         // CAMERA CAPTURING SECTION END
     </script>
 </body>

@@ -7,6 +7,7 @@ use App\Models\Student;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -78,27 +79,28 @@ class StudentController extends Controller
     {
 
 
-        $imageDataUrl = $request->input('image');
+        $imageFile = $request->input('image');
         $studentId = $request->input('studentId');
 
-        // return response()->json(['result' => $imageDataUrl]);
-
-
-
-
+        // return response()->json(['result' => $imageFile]);
 
         // Decode the data URL and save the image
-        list($type, $data) = explode(';', $imageDataUrl);
+        list($type, $data) = explode(';', $imageFile);
         list(, $data)      = explode(',', $data);
-        $decodedImage = base64_decode($data);      
-        
+
+        $decodedImage = base64_decode($data);
+
         // Save the image to a storage location
         $imageName = $studentId . '.png';
         try {
-            if (!file_exists(public_path("images/"))) {
-                mkdir(public_path("images/"), 666, true);
-            }
-            file_put_contents(public_path("images/" . $imageName), $decodedImage);
+
+            // Store the file in the storage/app/public/user-photos directory
+            Storage::disk('public')->put('images/' . $imageName, $decodedImage);
+
+            // if (!file_exists(public_path("images/"))) {
+            //     mkdir(public_path("images/"), 666, true);
+            // }
+            // file_put_contents(public_path("images/" . $imageName), $decodedImage);
         } catch (Exception $e) {
             return response()->json([
                 'error' => true,

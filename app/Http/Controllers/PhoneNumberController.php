@@ -9,19 +9,23 @@ use Illuminate\Support\Facades\Http;
 
 class PhoneNumberController extends Controller
 {
-   public function sms(Request $request)
+    public function sms(Request $request)
     {
-
         // Phone number
         // Generating message
         $request->validate([
             'phone_number' => ['required', 'max:12']
         ]);
         $randomNumber = rand(1000, 9999);
-        PhoneNumber::create([
-            'phone_number' => $request->phone_number,
-            'message' => $randomNumber
-        ]);
+        PhoneNumber::UpdateOrCreate(
+            [
+                'phone_number' => $request->phone_number
+            ],
+            [
+                'phone_number' => $request->phone_number,
+                'message' => $randomNumber
+            ]
+        );
 
         // Replace this with your actual JSON payload
         // Phone number should be 998999905518 this kind of format
@@ -48,8 +52,8 @@ class PhoneNumberController extends Controller
         try {
             Http::withBody($jsonPayload)->withBasicAuth($username, $password)->withHeaders([
                 'headers' => [
-                            'Accept' => 'application/json'
-                        ],
+                    'Accept' => 'application/json'
+                ],
             ])->post($url);
 
             // Process the response data as needed
