@@ -40,11 +40,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/students/image', [StudentController::class, 'imageUpload'])->name('students.imageUpload');
 
     Route::post('/sendSms', [PhoneNumberController::class, 'sms'])->name('send.sms');
+    Route::post('/checkingConfirmationNumber', [PhoneNumberController::class, 'checkingConfirmationNumber'])->name('checkingConfirmationNumber');
 });
 
 
 
-
+// Codes written below will be removed
 
 Route::get('/sendSms', function(){
     return view('dashboard.test');

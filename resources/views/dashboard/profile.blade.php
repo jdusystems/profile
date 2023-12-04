@@ -148,16 +148,15 @@
                                     <div class="col-sm-4 d-flex align-items-center">
                                         <p class="mb-0">Jo'natilgan sms ni kiriting</p>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-4 col-md-5">
                                         <div class="input-group flex-nowrap">
                                             <input type="text" class="form-control form-control-sm mb-0 text-muted"
-                                                id="confirmation_sms" name="phone_number"
-                                                value="{{ $student->phone_number }}" required aria-label="Username"
-                                                aria-describedby="addon-wrapping" onkeyup="phoneNumberFormatter()">
+                                                id="phoneNumberConfirmationInput">
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <button class="btn btn-sm btn-primary">Tasdiqlash</button>
+                                    <div
+                                        class="col-sm-4 col-md-3  d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" class="btn btn-sm btn-primary" data-phone="phone_number" data-sms="phoneNumberConfirmationInput" onclick="confirmSms()">Tasdiqlash</button>
                                     </div>
                                 </div>
                                 <hr>
@@ -169,7 +168,7 @@
                                         <div class="input-group flex-nowrap">
                                             <span class="input-group-text" id="addon-wrapping">+998</span>
                                             <input type="text" class="form-control mb-0 text-muted"
-                                                id="parents_phone_number" name="contact_number"
+                                                id="contact_number" name="contact_number"
                                                 value="{{ $student->contact_number }}"
                                                 onkeyup="phoneNumberFormatter()">
                                         </div>
@@ -212,6 +211,8 @@
         const sendSmsPhoneNumberButton = document.getElementById('sendSmsPhoneNumberButton');
         const phoneNumberSmsConfirmationSection = document.getElementById('phoneNumberSmsConfirmationSection');
         const phoneNumber = document.getElementById('phone_number');
+        const phoneNumberConfirmationInput = document.getElementById('phoneNumberConfirmationInput');
+
 
         // Toasts for notifications
         const Toast = Swal.mixin({
@@ -225,30 +226,6 @@
                 toast.onmouseleave = Swal.resumeTimer;
             }
         });
-        // PHONE NUMBER FORMATTER STARTS HERE
-        function formatPhoneNumber(value) {
-            if (!value) return value;
-
-            const phoneNumber = value.replace(/[^\d]/g, '');
-            const phoneNumberLength = phoneNumber.length;
-
-            if (phoneNumberLength <= 2) {
-                return phoneNumber;
-            } else if (phoneNumberLength <= 5) {
-                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2)}`;
-            } else if (phoneNumberLength <= 7) {
-                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5)}`;
-            } else {
-                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5, 7)}-${phoneNumber.slice(7, 9)}`;
-            }
-        }
-
-        function phoneNumberFormatter() {
-            const inputField = document.getElementById(event.target.id)
-            const formattedInputValue = formatPhoneNumber(inputField.value)
-            inputField.value = formattedInputValue;
-        }
-        // PHONE NUMBER FORMATTER ENDS HERE
 
         // SMS CONFIRMATION SECTION STARTS HERE
         sendSmsPhoneNumberButton.addEventListener('click', function(event) {
@@ -268,6 +245,7 @@
                 .then(data => {
                     console.log('Success:', data);
                     phoneNumberSmsConfirmationSection.classList.remove('d-none');
+                    phoneNumberConfirmationInput.focus();
                 })
                 .catch((error) => {
                     console.error('Error sending sms to server:', error);
@@ -286,8 +264,6 @@
         // CAMERA CAPTURING SECTION START
 
         const myModal = new bootstrap.Modal(document.getElementById('modalForCapturing'));
-
-        myModal.hide()
 
         let stream;
 
@@ -344,6 +320,30 @@
                 alert('Camera stream not available. Make sure the camera is accessible.');
             }
         }
+        // CAMERA CAPTURING SECTION END
+
+        function formatPhoneNumber(value) {
+            if (!value) return value;
+
+            const phoneNumber = value.replace(/[^\d]/g, '');
+            const phoneNumberLength = phoneNumber.length;
+
+            if (phoneNumberLength <= 2) {
+                return phoneNumber;
+            } else if (phoneNumberLength <= 5) {
+                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2)}`;
+            } else if (phoneNumberLength <= 7) {
+                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5)}`;
+            } else {
+                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5, 7)}-${phoneNumber.slice(7, 9)}`;
+            }
+        }
+
+        function phoneNumberFormatter() {
+            const inputField = document.getElementById(event.target.id)
+            const formattedInputValue = formatPhoneNumber(inputField.value)
+            inputField.value = formattedInputValue;
+        }
 
         function sendImageToServer(dataUrl) {
 
@@ -372,7 +372,65 @@
                 });
         }
 
-        // CAMERA CAPTURING SECTION END
+        async function confirmSms() {
+            const phoneNumber = document.getElementById(event.target.dataset.phone);
+            const sms = document.getElementById(event.target.dataset.sms);
+            const formattedPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
+            const isParentsPhone = phoneNumber.name == 'phone_number' ? false : true;
+
+            let result = await checkingConfirmationNumber(studentId.value, formattedPhoneNumber, sms.value, isParentsPhone);
+
+            if(result) {
+                // console.log("Confirmed");
+                sms.value = '';
+                phoneNumberSmsConfirmationSection.classList.add('d-none');
+                sendSmsPhoneNumberButton.disabled = true;
+                phoneNumber.disabled = true;
+            } else {
+                console.log("Not confirmed");
+            }
+
+
+        }
+
+        async function checkingConfirmationNumber(studentId, phoneNumber, sms, isParentsPhone) {
+            return await fetch('/checkingConfirmationNumber', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        studentId,
+                        phoneNumber,
+                        sms,
+                        isParentsPhone
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if(data.status == 'success') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message
+                        });
+                        return true;
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.error
+                        });
+                        return false;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Failed on sms code validation', error);
+                    return false;
+                });
+        }
+
+
     </script>
 </body>
 

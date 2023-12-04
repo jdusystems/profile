@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\PhoneNumber;
-use GuzzleHttp\Client;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class PhoneNumberController extends Controller
 {
     public function sms(Request $request)
     {
+        return response()->json(['success' => "Successfully"], 200);
         // Phone number
         // Generating message
         $request->validate([
@@ -63,5 +65,56 @@ class PhoneNumberController extends Controller
             // Handle exceptions or errors
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function checkingConfirmationNumber(Request $request)
+    {
+        // Validation rules
+        $rules = [
+            'studentId' => ['required', 'exists:students,student_id'],
+            'phoneNumber' => ['required', 'size:12'],
+            'sms' => ['required'],
+            'isParentsPhone' => ['required', 'boolean']   // if this is true phoneNumber is parent's otherwise Student's phone number
+        ];
+
+        // Custom error messages
+        $messages = [
+            'phoneNumber.required' => 'Telefon raqamini kiritish shart.',
+            'phoneNumber.max' => "Telefon raqamini formati noto'g'ri.",
+            'sms.required' => 'Tasdiqlash kodini kiriting.',
+            // Add custom messages for other rules...
+        ];
+
+        // Validate the request
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        // If validation fails, return JSON response with errors
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if (PhoneNumber::where('phone_number', $request->phoneNumber)->first()) {
+            $phoneNumber = PhoneNumber::where('phone_number', $request->phoneNumber)->first();
+            if ($phoneNumber->message == $request->sms) {
+                $student = Student::where('student_id' ,$request->studentId)->first();
+                if ($request->isParentsPhone) {
+                    $student->contact_number = $request->phoneNumber;
+                } else {
+                    $student->phone_number = $request->phoneNumber;
+                }
+                $student->save();
+                // Removing row from phone_numbers table 
+                // PhoneNumber::where('phone_number', $request->phoneNumber)->delete();
+
+                return response()->json(['status' => 'success', 'message' => 'Telefon raqami tasdiqlandi!'], 200);
+            } else {
+                return response()->json(['status' => 'error', 'error' => "Tasdiqlash kodi noto'g'ri"], 422);
+            }
+        } else {
+            return response()->json(['status' => 'error', 'error' => "Telefon raqamni qayta kiriting"], 404);
+            // Record does not exist
+        }
+
+        return response()->json($request);
     }
 }
