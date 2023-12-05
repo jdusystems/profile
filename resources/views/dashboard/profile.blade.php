@@ -133,8 +133,9 @@
                                             <span class="input-group-text" id="addon-wrapping">+998</span>
                                             <input type="text" class="form-control mb-0 text-muted"
                                                 id="phone_number" name="phone_number"
-                                                value="{{ $student->phone_number }}" required aria-label="Username"
-                                                aria-describedby="addon-wrapping" onkeyup="phoneNumberFormatter()">
+                                                value="{{ Str::substr($student->phone_number, 3, 9) }}" required
+                                                aria-label="Username" aria-describedby="addon-wrapping"
+                                                onkeyup="phoneNumberFormatter()">
                                         </div>
                                     </div>
                                     <div
@@ -156,23 +157,49 @@
                                     </div>
                                     <div
                                         class="col-sm-4 col-md-3  d-flex align-items-center justify-content-center justify-content-sm-end">
-                                        <button type="button" class="btn btn-sm btn-primary" data-phone="phone_number" data-sms="phoneNumberConfirmationInput" onclick="confirmSms()">Tasdiqlash</button>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            data-phone="phone_number" data-sms="phoneNumberConfirmationInput"
+                                            onclick="confirmSms()">Tasdiqlash</button>
                                     </div>
                                 </div>
+
                                 <hr>
-                                <div class="row">
+
+                                <div class="row align-items-center">
                                     <div class="col-sm-4 d-flex align-items-center">
                                         <p class="mb-0">Ota-onasining telefon raqami</p>
                                     </div>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-8 col-md-5">
                                         <div class="input-group flex-nowrap">
                                             <span class="input-group-text" id="addon-wrapping">+998</span>
                                             <input type="text" class="form-control mb-0 text-muted"
                                                 id="contact_number" name="contact_number"
-                                                value="{{ $student->contact_number }}"
+                                                value="{{ Str::substr($student->contact_number, 3, 9) }}"
                                                 onkeyup="phoneNumberFormatter()">
                                         </div>
-
+                                    </div>
+                                    <div
+                                        class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" id="sendSmsContactNumberButton"
+                                            class="btn btn-sm btn-primary">SMS
+                                            jo'natish</button>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 d-none" id="contactNumberSmsConfirmationSection">
+                                    <div class="col-sm-4 d-flex align-items-center">
+                                        <p class="mb-0">Jo'natilgan sms ni kiriting</p>
+                                    </div>
+                                    <div class="col-sm-4 col-md-5">
+                                        <div class="input-group flex-nowrap">
+                                            <input type="text" class="form-control form-control-sm mb-0 text-muted"
+                                                id="contactNumberConfirmationInput">
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="col-sm-4 col-md-3  d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            data-phone="contact_number" data-sms="contactNumberConfirmationInput"
+                                            onclick="confirmSms()">Tasdiqlash</button>
                                     </div>
                                 </div>
                                 <hr>
@@ -208,12 +235,31 @@
         const userAvatar = document.getElementById('user_avatar');
         const studentImage = document.getElementById('student_image');
         const studentId = document.getElementById('student_id');
+
+        const phoneNumber = document.getElementById('phone_number');
         const sendSmsPhoneNumberButton = document.getElementById('sendSmsPhoneNumberButton');
         const phoneNumberSmsConfirmationSection = document.getElementById('phoneNumberSmsConfirmationSection');
-        const phoneNumber = document.getElementById('phone_number');
         const phoneNumberConfirmationInput = document.getElementById('phoneNumberConfirmationInput');
 
+        const contactNumber = document.getElementById('contact_number');
+        const sendSmsContactNumberButton = document.getElementById('sendSmsContactNumberButton');
+        const contactNumberSmsConfirmationSection = document.getElementById('contactNumberSmsConfirmationSection');
+        const contactNumberConfirmationInput = document.getElementById('contactNumberConfirmationInput');
 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all input elements
+            var inputElements = document.querySelectorAll('input');
+
+            // Add event listener to each input element
+            inputElements.forEach(function(inputElement) {
+                inputElement.addEventListener('keypress', function(event) {
+                    // Check if the pressed key is Enter (key code 13)
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
         // Toasts for notifications
         const Toast = Swal.mixin({
             toast: true,
@@ -230,7 +276,6 @@
         // SMS CONFIRMATION SECTION STARTS HERE
         sendSmsPhoneNumberButton.addEventListener('click', function(event) {
             const filteredPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
-
             fetch('/sendSms', {
                     method: 'POST',
                     headers: {
@@ -243,19 +288,47 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data);
+                    Toast.fire({
+                        icon: "success",
+                        title: data.message
+                    });
                     phoneNumberSmsConfirmationSection.classList.remove('d-none');
                     phoneNumberConfirmationInput.focus();
                 })
                 .catch((error) => {
                     console.error('Error sending sms to server:', error);
-                    Swal.fire({
-                        position: "top-end",
+                    Toast.fire({
                         icon: "error",
-                        title: "Tasdiqlash kodi noto'g'ri",
-                        showConfirmButton: false,
-                        timer: 1000
+                        title: "Tasdiqlash kodi noto'g'ri"
                     });
+                });
+
+        })
+        sendSmsContactNumberButton.addEventListener('click', function(event) {
+            const filteredContactNumber = "998" + contactNumber.value.replace(/[^\d]/g, '');
+            fetch('/sendSms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        phone_number: filteredContactNumber
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    contactNumberSmsConfirmationSection.classList.remove('d-none');
+                    contactNumberConfirmationInput.focus();
+                })
+                .catch((error) => {
+                    console.error('Error sending sms to server:', error);
+                    Toast.fire({
+                        icon: "error",
+                        title: "Tasdiqlash kodi noto'g'ri"
+                    });
+                    
                 });
 
         })
@@ -378,13 +451,19 @@
             const formattedPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
             const isParentsPhone = phoneNumber.name == 'phone_number' ? false : true;
 
-            let result = await checkingConfirmationNumber(studentId.value, formattedPhoneNumber, sms.value, isParentsPhone);
+            let result = await checkingConfirmationNumber(studentId.value, formattedPhoneNumber, sms.value,
+                isParentsPhone);
 
-            if(result) {
+            if (result) {
                 // console.log("Confirmed");
                 sms.value = '';
-                phoneNumberSmsConfirmationSection.classList.add('d-none');
-                sendSmsPhoneNumberButton.disabled = true;
+                if (isParentsPhone) {
+                    sendSmsContactNumberButton.disabled = true;
+                    contactNumberSmsConfirmationSection.classList.add('d-none');
+                } else {
+                    sendSmsPhoneNumberButton.disabled = true;
+                    phoneNumberSmsConfirmationSection.classList.add('d-none');
+                }
                 phoneNumber.disabled = true;
             } else {
                 console.log("Not confirmed");
@@ -410,7 +489,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    if(data.status == 'success') {
+                    if (data.status == 'success') {
                         Toast.fire({
                             icon: "success",
                             title: data.message
@@ -429,8 +508,6 @@
                     return false;
                 });
         }
-
-
     </script>
 </body>
 

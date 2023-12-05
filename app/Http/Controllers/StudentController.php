@@ -65,12 +65,16 @@ class StudentController extends Controller
      */
     public function update(StoreStudentRequest $request, Student $student)
     {
+        // Remove spaces and non-numeric symbols
+        $cleanedPhoneNumber = preg_replace('/[^0-9]/', '', $request->phone_number);
+        $cleanedContactNumber = preg_replace('/[^0-9]/', '', $request->contact_number);
+
         $student->update([
             'student_id' => $request->student_id,
             'surname' => $request->surname,
             'given_name' => $request->given_name,
-            'phone_number' => $request->phone_number,
-            'contact_number' => $request->contact_number
+            'phone_number' => "998" . $cleanedPhoneNumber,
+            'contact_number' => "998" . $cleanedContactNumber
         ]);
         return view('dashboard.index');
     }

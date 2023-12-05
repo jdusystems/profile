@@ -12,7 +12,7 @@ class PhoneNumberController extends Controller
 {
     public function sms(Request $request)
     {
-        return response()->json(['success' => "Successfully"], 200);
+        // return response()->json(['success' => "Successfully"], 200);
         // Phone number
         // Generating message
         $request->validate([
@@ -104,7 +104,7 @@ class PhoneNumberController extends Controller
                 }
                 $student->save();
                 // Removing row from phone_numbers table 
-                // PhoneNumber::where('phone_number', $request->phoneNumber)->delete();
+                PhoneNumber::where('phone_number', $request->phoneNumber)->delete();
 
                 return response()->json(['status' => 'success', 'message' => 'Telefon raqami tasdiqlandi!'], 200);
             } else {
