@@ -7,6 +7,7 @@ use App\Models\Student;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -23,6 +24,7 @@ class StudentController extends Controller
      */
     public function create(Request $request)
     {
+        //
     }
 
     /**
@@ -32,7 +34,14 @@ class StudentController extends Controller
     {
         $student_id = $request->student_id;
         $student = Student::where('student_id', $student_id)->firstOrFail();
-        return view('dashboard.profile', ['student' => $student]);
+
+        if (Storage::disk('public')->exists("images/$request->student_id.png")) {
+            // Generate a public URL for the user's photo
+            $photoUrl = Storage::url("images/$request->student_id.png");
+        } else {
+            $photoUrl = "avatar.webp";
+        }
+        return view('dashboard.profile', ['student' => $student, 'photo_url' => $photoUrl]);
     }
 
     /**
@@ -56,12 +65,16 @@ class StudentController extends Controller
      */
     public function update(StoreStudentRequest $request, Student $student)
     {
+        // Remove spaces and non-numeric symbols
+        $cleanedPhoneNumber = preg_replace('/[^0-9]/', '', $request->phone_number);
+        $cleanedContactNumber = preg_replace('/[^0-9]/', '', $request->contact_number);
+
         $student->update([
             'student_id' => $request->student_id,
             'surname' => $request->surname,
             'given_name' => $request->given_name,
-            'phone_number' => $request->phone_number,
-            'contact_number' => $request->contact_number
+            // 'phone_number' => "998" . $cleanedPhoneNumber,
+            // 'contact_number' => "998" . $cleanedContactNumber
         ]);
         return view('dashboard.index');
     }
@@ -76,29 +89,20 @@ class StudentController extends Controller
 
     public function imageUpload(Request $request)
     {
-
-
-        $imageDataUrl = $request->input('image');
+        $imageFile = $request->input('image');
         $studentId = $request->input('studentId');
 
-        // return response()->json(['result' => $imageDataUrl]);
-
-
-
-
-
         // Decode the data URL and save the image
-        list($type, $data) = explode(';', $imageDataUrl);
+        list($type, $data) = explode(';', $imageFile);
         list(, $data)      = explode(',', $data);
-        $decodedImage = base64_decode($data);      
-        
+
+        $decodedImage = base64_decode($data);
+
         // Save the image to a storage location
         $imageName = $studentId . '.png';
         try {
-            if (!file_exists(public_path("images/"))) {
-                mkdir(public_path("images/"), 666, true);
-            }
-            file_put_contents(public_path("images/" . $imageName), $decodedImage);
+            // Store the file in the storage/app/public/images directory
+            Storage::disk('public')->put('images/' . $imageName, $decodedImage);
         } catch (Exception $e) {
             return response()->json([
                 'error' => true,
@@ -107,7 +111,7 @@ class StudentController extends Controller
             ], 422);
         }
 
-        // You can save the image information to the database if needed
+        // We can save the image information to the database if needed
 
         return response()->json([
             'success' => true,

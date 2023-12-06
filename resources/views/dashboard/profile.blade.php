@@ -44,11 +44,11 @@
                 <div class="col-lg-4">
                     <div class="card mb-4">
                         <div class="card-body text-center">
-                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
-                                id="user_avatar" alt="avatar" class="rounded-circle img-fluid" style="width: 150px;">
-                            <h5 class="my-3">Abdullayev Alisher</h5>
-                            <p class="text-muted mb-1">Full Stack Developer</p>
-                            <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
+                            <img src="{{ asset($photo_url) }}" id="user_avatar" alt="avatar"
+                                class="rounded-circle img-fluid" style="width: 150px;">
+                            <h5 class="my-3">{{ $student->given_name . ' ' . $student->surname }}</h5>
+                            <p class="text-muted mb-1">Talaba</p>
+                            <p class="text-muted mb-4">Japan Digital University</p>
                             <div class="d-flex justify-content-center mb-2">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#modalForCapturing">Rasmga olish</button>
@@ -77,19 +77,10 @@
                                         <button type="button" onclick="capturePhoto()"
                                             class="btn btn-warning mt-4">Capture
                                             Photo</button>
-                                        {{-- <button type="button" onclick="stopCapture()" class="btn btn-danger">Stop --}}
-                                        {{-- Capturing</button> --}}
                                     </div>
-
-                                    {{-- <img id="captured-photo" alt="Captured Photo"> --}}
-                                    {{-- <input type="file" id="upload-input" name="file" style="display: none;"> --}}
 
                                 </div>
                             </div>
-                            {{-- <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
-                                <button type="button" class="btn btn-primary">Rasmga olish</button>
-                            </div> --}}
                         </div>
                     </div>
                 </div>
@@ -108,8 +99,10 @@
                                         <p class="mb-0">Talaba ID</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" id="student_id" class="form-control mb-0 text-muted" name="student_id"
-                                            value="{{ $student->student_id }}">
+                                        <input type="text" class="form-control mb-0 text-muted"
+                                             value="{{ $student->student_id }}" disabled>
+                                        <input type="hidden" id="student_id" class="form-control mb-0 text-muted"
+                                            name="student_id" value="{{ $student->student_id }}">
                                     </div>
                                 </div>
                                 <hr>
@@ -137,34 +130,82 @@
                                     <div class="col-sm-4 d-flex align-items-center">
                                         <p class="mb-0">Telefon raqami</p>
                                     </div>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-8 col-md-5">
                                         <div class="input-group flex-nowrap">
                                             <span class="input-group-text" id="addon-wrapping">+998</span>
                                             <input type="text" class="form-control mb-0 text-muted"
                                                 id="phone_number" name="phone_number"
-                                                value="{{ $student->phone_number }}" required aria-label="Username"
-                                                aria-describedby="addon-wrapping" onkeyup="phoneNumberFormatter()">
+                                                value="{{ Str::substr($student->phone_number, 3, 9) }}" required
+                                                aria-label="Username" aria-describedby="addon-wrapping"
+                                                onkeyup="phoneNumberFormatter()">
                                         </div>
                                     </div>
+                                    <div
+                                        class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" id="sendSmsPhoneNumberButton"
+                                            class="btn btn-sm btn-primary">SMS
+                                            jo'natish</button>
+                                    </div>
                                 </div>
+                                <div class="row mt-2 d-none" id="phoneNumberSmsConfirmationSection">
+                                    <div class="col-sm-4 d-flex align-items-center">
+                                        <p class="mb-0">Jo'natilgan sms ni kiriting</p>
+                                    </div>
+                                    <div class="col-sm-4 col-md-5">
+                                        <div class="input-group flex-nowrap">
+                                            <input type="text" class="form-control form-control-sm mb-0 text-muted"
+                                                id="phoneNumberConfirmationInput">
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="col-sm-4 col-md-3  d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            data-phone="phone_number" data-sms="phoneNumberConfirmationInput"
+                                            onclick="confirmSms()">Tasdiqlash</button>
+                                    </div>
+                                </div>
+
                                 <hr>
-                                <div class="row">
+
+                                <div class="row align-items-center">
                                     <div class="col-sm-4 d-flex align-items-center">
                                         <p class="mb-0">Ota-onasining telefon raqami</p>
                                     </div>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-8 col-md-5">
                                         <div class="input-group flex-nowrap">
                                             <span class="input-group-text" id="addon-wrapping">+998</span>
                                             <input type="text" class="form-control mb-0 text-muted"
-                                                id="parents_phone_number" name="contact_number"
-                                                value="{{ $student->contact_number }}"
+                                                id="contact_number" name="contact_number"
+                                                value="{{ Str::substr($student->contact_number, 3, 9) }}"
                                                 onkeyup="phoneNumberFormatter()">
                                         </div>
-
+                                    </div>
+                                    <div
+                                        class="col-sm-12 col-md-3 d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" id="sendSmsContactNumberButton"
+                                            class="btn btn-sm btn-primary">SMS
+                                            jo'natish</button>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 d-none" id="contactNumberSmsConfirmationSection">
+                                    <div class="col-sm-4 d-flex align-items-center">
+                                        <p class="mb-0">Jo'natilgan sms ni kiriting</p>
+                                    </div>
+                                    <div class="col-sm-4 col-md-5">
+                                        <div class="input-group flex-nowrap">
+                                            <input type="text" class="form-control form-control-sm mb-0 text-muted"
+                                                id="contactNumberConfirmationInput">
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="col-sm-4 col-md-3  d-flex align-items-center justify-content-center justify-content-sm-end">
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            data-phone="contact_number" data-sms="contactNumberConfirmationInput"
+                                            onclick="confirmSms()">Tasdiqlash</button>
                                     </div>
                                 </div>
                                 <hr>
-                               
+
                                 <div class="row mt-3">
                                     <div class="col-sm-4 d-flex align-items-center"></div>
                                     <div class="col-sm-8">
@@ -185,48 +226,127 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script defer>
-        // PHONE NUMBER FORMATTER STARTS HERE
-        function formatPhoneNumber(value) {
-            if (!value) return value;
-
-            const phoneNumber = value.replace(/[^\d]/g, '');
-            const phoneNumberLength = phoneNumber.length;
-
-            if (phoneNumberLength <= 2) {
-                return phoneNumber;
-            } else if (phoneNumberLength <= 5) {
-                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2)}`;
-            } else if (phoneNumberLength <= 7) {
-                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5)}`;
-            } else {
-                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5, 7)}-${phoneNumber.slice(7, 9)}`;
-            }
-        }
-
-        function phoneNumberFormatter() {
-            const inputField = document.getElementById(event.target.id)
-            const formattedInputValue = formatPhoneNumber(inputField.value)
-            inputField.value = formattedInputValue;
-            console.log(formattedInputValue);
-        }
-        // PHONE NUMBER FORMATTER ENDS HERE
-
-
-        // CAMERA CAPTURING SECTION START
-
-        const myModal = new bootstrap.Modal(document.getElementById('modalForCapturing')); 
-
-        myModal.hide()
-
-        console.log("Script is running");
+        // Global variables
+        const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
         const video = document.getElementById('video');
         const capturedPhoto = document.getElementById('captured-photo');
         const uploadInput = document.getElementById('upload-input');
         const userAvatar = document.getElementById('user_avatar');
         const studentImage = document.getElementById('student_image');
         const studentId = document.getElementById('student_id');
+
+        const phoneNumber = document.getElementById('phone_number');
+        const sendSmsPhoneNumberButton = document.getElementById('sendSmsPhoneNumberButton');
+        const phoneNumberSmsConfirmationSection = document.getElementById('phoneNumberSmsConfirmationSection');
+        const phoneNumberConfirmationInput = document.getElementById('phoneNumberConfirmationInput');
+
+        const contactNumber = document.getElementById('contact_number');
+        const sendSmsContactNumberButton = document.getElementById('sendSmsContactNumberButton');
+        const contactNumberSmsConfirmationSection = document.getElementById('contactNumberSmsConfirmationSection');
+        const contactNumberConfirmationInput = document.getElementById('contactNumberConfirmationInput');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all input elements
+            var inputElements = document.querySelectorAll('input');
+
+            // Add event listener to each input element
+            inputElements.forEach(function(inputElement) {
+                inputElement.addEventListener('keypress', function(event) {
+                    // Check if the pressed key is Enter (key code 13)
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+        // Toasts for notifications
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+
+        // SMS CONFIRMATION SECTION STARTS HERE
+        sendSmsPhoneNumberButton.addEventListener('click', function(event) {
+            if(phoneNumber.value == "") {
+                phoneNumber.focus()
+                return 0;
+            }
+            const filteredPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
+            fetch('/sendSms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        phone_number: filteredPhoneNumber
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Toast.fire({
+                        icon: "success",
+                        title: data.message
+                    });
+                    phoneNumberSmsConfirmationSection.classList.remove('d-none');
+                    phoneNumberConfirmationInput.focus();
+                })
+                .catch((error) => {
+                    console.error('Error sending sms to server:', error);
+                    Toast.fire({
+                        icon: "error",
+                        title: "SMS jo'natilmadi!"
+                    });
+                });
+
+        })
+        sendSmsContactNumberButton.addEventListener('click', function(event) {
+            if(contactNumber.value == "") {
+                contactNumber.focus()
+                return 0;
+            }
+            const filteredContactNumber = "998" + contactNumber.value.replace(/[^\d]/g, '');
+            fetch('/sendSms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        phone_number: filteredContactNumber
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    contactNumberSmsConfirmationSection.classList.remove('d-none');
+                    contactNumberConfirmationInput.focus();
+                })
+                .catch((error) => {
+                    console.error('Error sending sms to server:', error);
+                    Toast.fire({
+                        icon: "error",
+                        title: "Tasdiqlash kodi noto'g'ri"
+                    });
+                    
+                });
+
+        })
+        // SMS CONFIRMATION SECTION ENDS HERE
+
+        // CAMERA CAPTURING SECTION START
+
+        const myModal = new bootstrap.Modal(document.getElementById('modalForCapturing'));
 
         let stream;
 
@@ -266,21 +386,12 @@
                 // Convert the canvas content to a data URL representing the image
                 const dataUrl = canvas.toDataURL('image/png');
 
-                // Display the captured photo
-                // capturedPhoto.src = dataUrl;
-                // capturedPhoto.style.display = 'block';
-
-                // Display and enable the download link
-                // downloadLink.href = dataUrl;
-                // downloadLink.style.display = 'inline';
-                // downloadLink.download = 'captured_photo.png'; // specify the filename for download
-
                 // Set the value of the upload input to the data URL
                 // uploadInput.value = dataUrl;
                 // Set the value of the user avatar
                 // studentImage.value = dataUrl;
-                
-                
+
+
                 sendImageToServer(dataUrl)
 
                 userAvatar.src = dataUrl
@@ -292,9 +403,32 @@
                 alert('Camera stream not available. Make sure the camera is accessible.');
             }
         }
+        // CAMERA CAPTURING SECTION END
+
+        function formatPhoneNumber(value) {
+            if (!value) return value;
+
+            const phoneNumber = value.replace(/[^\d]/g, '');
+            const phoneNumberLength = phoneNumber.length;
+
+            if (phoneNumberLength <= 2) {
+                return phoneNumber;
+            } else if (phoneNumberLength <= 5) {
+                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2)}`;
+            } else if (phoneNumberLength <= 7) {
+                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5)}`;
+            } else {
+                return `${phoneNumber.slice(0, 2)} ${phoneNumber.slice(2, 5)}-${phoneNumber.slice(5, 7)}-${phoneNumber.slice(7, 9)}`;
+            }
+        }
+
+        function phoneNumberFormatter() {
+            const inputField = document.getElementById(event.target.id)
+            const formattedInputValue = formatPhoneNumber(inputField.value)
+            inputField.value = formattedInputValue;
+        }
 
         function sendImageToServer(dataUrl) {
-            const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
 
             fetch('/students/image', {
                     method: 'POST',
@@ -309,8 +443,10 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data);
-                    // console.log('Shu joy')
+                    Toast.fire({
+                        icon: "success",
+                        title: "Rasm muvaffaqiyatli saqlandi!"
+                    });
                     return true;
                 })
                 .catch((error) => {
@@ -319,27 +455,69 @@
                 });
         }
 
+        async function confirmSms() {
+            const phoneNumber = document.getElementById(event.target.dataset.phone);
+            const sms = document.getElementById(event.target.dataset.sms);
+            const formattedPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
+            const isParentsPhone = phoneNumber.name == 'phone_number' ? false : true;
 
-        function stopCapture() {
-            if (stream) {
-                const tracks = stream.getTracks();
+            let result = await checkingConfirmationNumber(studentId.value, formattedPhoneNumber, sms.value,
+                isParentsPhone);
 
-                tracks.forEach(track => {
-                    track.stop();
-                });
-
-                if (videoElement) {
-                    videoElement.srcObject = null;
-                    videoElement.remove();
-                    videoElement = null;
+            if (result) {
+                // console.log("Confirmed");
+                sms.value = '';
+                if (isParentsPhone) {
+                    sendSmsContactNumberButton.disabled = true;
+                    contactNumberSmsConfirmationSection.classList.add('d-none');
+                } else {
+                    sendSmsPhoneNumberButton.disabled = true;
+                    phoneNumberSmsConfirmationSection.classList.add('d-none');
                 }
-
-                stream = null;
+                phoneNumber.disabled = true;
             } else {
-                alert('No capture stream to stop.');
+                console.log("Not confirmed");
             }
+
+
         }
-        // CAMERA CAPTURING SECTION END
+
+        async function checkingConfirmationNumber(studentId, phoneNumber, sms, isParentsPhone) {
+            return await fetch('/checkingConfirmationNumber', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        studentId,
+                        phoneNumber,
+                        sms,
+                        isParentsPhone
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.status == 'success') {
+                        Toast.fire({
+                            icon: "success",
+                            title: data.message
+                        });
+                        return true;
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: data.error
+                        });
+                        return false;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Failed on sms code validation', error);
+                    return false;
+                });
+        }
     </script>
 </body>
 
