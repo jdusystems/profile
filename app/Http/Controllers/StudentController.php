@@ -73,8 +73,8 @@ class StudentController extends Controller
             'student_id' => $request->student_id,
             'surname' => $request->surname,
             'given_name' => $request->given_name,
-            'phone_number' => "998" . $cleanedPhoneNumber,
-            'contact_number' => "998" . $cleanedContactNumber
+            // 'phone_number' => "998" . $cleanedPhoneNumber,
+            // 'contact_number' => "998" . $cleanedContactNumber
         ]);
         return view('dashboard.index');
     }

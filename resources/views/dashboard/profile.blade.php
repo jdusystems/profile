@@ -99,7 +99,9 @@
                                         <p class="mb-0">Talaba ID</p>
                                     </div>
                                     <div class="col-sm-8">
-                                        <input type="text" id="student_id" class="form-control mb-0 text-muted"
+                                        <input type="text" class="form-control mb-0 text-muted"
+                                             value="{{ $student->student_id }}" disabled>
+                                        <input type="hidden" id="student_id" class="form-control mb-0 text-muted"
                                             name="student_id" value="{{ $student->student_id }}">
                                     </div>
                                 </div>
@@ -275,6 +277,10 @@
 
         // SMS CONFIRMATION SECTION STARTS HERE
         sendSmsPhoneNumberButton.addEventListener('click', function(event) {
+            if(phoneNumber.value == "") {
+                phoneNumber.focus()
+                return 0;
+            }
             const filteredPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
             fetch('/sendSms', {
                     method: 'POST',
@@ -299,12 +305,16 @@
                     console.error('Error sending sms to server:', error);
                     Toast.fire({
                         icon: "error",
-                        title: "Tasdiqlash kodi noto'g'ri"
+                        title: "SMS jo'natilmadi!"
                     });
                 });
 
         })
         sendSmsContactNumberButton.addEventListener('click', function(event) {
+            if(contactNumber.value == "") {
+                contactNumber.focus()
+                return 0;
+            }
             const filteredContactNumber = "998" + contactNumber.value.replace(/[^\d]/g, '');
             fetch('/sendSms', {
                     method: 'POST',
