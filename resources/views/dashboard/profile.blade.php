@@ -100,7 +100,7 @@
                                     </div>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control mb-0 text-muted"
-                                             value="{{ $student->student_id }}" disabled>
+                                            value="{{ $student->student_id }}" disabled>
                                         <input type="hidden" id="student_id" class="form-control mb-0 text-muted"
                                             name="student_id" value="{{ $student->student_id }}">
                                     </div>
@@ -277,11 +277,20 @@
 
         // SMS CONFIRMATION SECTION STARTS HERE
         sendSmsPhoneNumberButton.addEventListener('click', function(event) {
-            if(phoneNumber.value == "") {
+            if (phoneNumber.value == "") {
                 phoneNumber.focus()
                 return 0;
             }
             const filteredPhoneNumber = "998" + phoneNumber.value.replace(/[^\d]/g, '');
+
+            if (filteredPhoneNumber.length < 12) {
+                Toast.fire({
+                    icon: "error",
+                    title: "Telefon raqami formatini to'g'ri kiriting"
+                });
+                return 0;
+            }
+
             fetch('/sendSms', {
                     method: 'POST',
                     headers: {
@@ -312,11 +321,18 @@
 
         })
         sendSmsContactNumberButton.addEventListener('click', function(event) {
-            if(contactNumber.value == "") {
+            if (contactNumber.value == "") {
                 contactNumber.focus()
                 return 0;
             }
             const filteredContactNumber = "998" + contactNumber.value.replace(/[^\d]/g, '');
+            if (filteredContactNumber.length < 12) {
+                Toast.fire({
+                    icon: "error",
+                    title: "Telefon raqami formatini to'g'ri kiriting"
+                });
+                return 0;
+            }
             fetch('/sendSms', {
                     method: 'POST',
                     headers: {
@@ -340,7 +356,7 @@
                         icon: "error",
                         title: "Tasdiqlash kodi noto'g'ri"
                     });
-                    
+
                 });
 
         })
