@@ -289,7 +289,8 @@
                         'X-CSRF-TOKEN': csrfToken,
                     },
                     body: JSON.stringify({
-                        phone_number: filteredPhoneNumber
+                        phone_number: filteredPhoneNumber,
+                        isParentsPhone: false,
                     }),
                 })
                 .then(response => response.json())
@@ -323,7 +324,8 @@
                         'X-CSRF-TOKEN': csrfToken,
                     },
                     body: JSON.stringify({
-                        phone_number: filteredContactNumber
+                        phone_number: filteredContactNumber,
+                        isParentsPhone: true,
                     }),
                 })
                 .then(response => response.json())
