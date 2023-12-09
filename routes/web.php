@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\PhoneNumberController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
@@ -41,12 +42,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/sendSms', [PhoneNumberController::class, 'sms'])->name('send.sms');
     Route::post('/checkingConfirmationNumber', [PhoneNumberController::class, 'checkingConfirmationNumber'])->name('checkingConfirmationNumber');
-});
 
-
-
-// Codes written below will be removed
-
-Route::get('/sendSms', function(){
-    return view('dashboard.test');
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::get('/students', [AdminController::class, 'students'])->name('students');
+    });
 });
