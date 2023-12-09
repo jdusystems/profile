@@ -46,5 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
         Route::get('/students', [AdminController::class, 'students'])->name('students');
+        Route::get('/images', [AdminController::class, 'images'])->name('images');
+        Route::get('/downloadImages', [AdminController::class, 'downloadImages'])->name('downloadImages');
     });
 });

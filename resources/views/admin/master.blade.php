@@ -159,7 +159,7 @@
                                 <i class="fas fa-users"></i>Talabalar ro'yxati</a>
                         </li>
                         <li>
-                            <a href="#">
+                            <a href="{{ route('admin.images') }}">
                                 <i class="fas fa-image"></i>Rasmlar</a>
                         </li>
                        
