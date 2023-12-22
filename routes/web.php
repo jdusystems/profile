@@ -4,7 +4,10 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\PhoneNumberController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Resources\ParentResourceCollection;
+use App\Models\Student;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -48,5 +51,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/students', [AdminController::class, 'students'])->name('students');
         Route::get('/images', [AdminController::class, 'images'])->name('images');
         Route::get('/downloadImages', [AdminController::class, 'downloadImages'])->name('downloadImages');
+    });
+
+
+    // Test route for getting data from database
+    Route::get('/data-to-parents', function(){
+        return new ParentResourceCollection(Student::all());
     });
 });
