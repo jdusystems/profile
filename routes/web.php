@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
         return view('dashboard.index');
     });
     Route::resource('/students', StudentController::class);
-    Route::post('/students/image', [StudentController::class, 'imageUpload'])->name('students.imageUpload');
+    Route::post('/student/image', [StudentController::class, 'imageUpload'])->name('students.imageUpload');
 
     Route::post('/sendSms', [PhoneNumberController::class, 'sms'])->name('send.sms');
     Route::post('/checkingConfirmationNumber', [PhoneNumberController::class, 'checkingConfirmationNumber'])->name('checkingConfirmationNumber');

@@ -448,7 +448,7 @@
 
         function sendImageToServer(dataUrl) {
 
-            fetch('/students/image', {
+            fetch('/student/image', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
