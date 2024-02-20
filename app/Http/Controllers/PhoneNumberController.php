@@ -16,7 +16,8 @@ class PhoneNumberController extends Controller
         // Phone number
         // Generating message
         $request->validate([
-            'phone_number' => ['required', 'max:12']
+            'phone_number' => ['required', 'max:12'],
+            'isParentsPhone' => ['required', 'boolean']
         ]);
         $randomNumber = rand(1000, 9999);
         PhoneNumber::UpdateOrCreate(
@@ -31,6 +32,11 @@ class PhoneNumberController extends Controller
 
         // Replace this with your actual JSON payload
         // Phone number should be 998999905518 this kind of format
+        if($request->isParentsPhone) {
+            $smsContent = "Japan Digital University da ta'lim olayotgan farzandingizning o'zlashtirish va davomat ko'rsatkichlarini qabul qilish uchun tasdiqlash kodi: ";
+        } else {
+            $smsContent = "Japan Digital University da o'zlashtirish va davomat ko'rsatkichlarini qabul qilish uchun tasdiqlash kodi: ";
+        }
         $jsonPayload = '{
             "messages": [
                 {
@@ -39,7 +45,7 @@ class PhoneNumberController extends Controller
                     "sms": {
                         "originator": "3700",
                         "content": {
-                            "text": "Tasdiqlash kodi: ' . $randomNumber . '"
+                            "text": "' . $smsContent . $randomNumber . '"
                         }
                     }
                 }

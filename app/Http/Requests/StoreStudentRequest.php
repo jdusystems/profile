@@ -25,8 +25,6 @@ class StoreStudentRequest extends FormRequest
             'student_id' => ['required' , 'max:10'],
             'surname' => ['required' ],
             'given_name' => ['required' ],
-            'phone_number' => ['required'],
-            'contact_number' => ['required'],
         ];
     }
     public function messages()

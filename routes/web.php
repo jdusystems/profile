@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\PhoneNumberController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Resources\ParentResourceCollection;
+use App\Models\Student;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -41,12 +45,17 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/sendSms', [PhoneNumberController::class, 'sms'])->name('send.sms');
     Route::post('/checkingConfirmationNumber', [PhoneNumberController::class, 'checkingConfirmationNumber'])->name('checkingConfirmationNumber');
-});
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::get('/students', [AdminController::class, 'students'])->name('students');
+        Route::get('/images', [AdminController::class, 'images'])->name('images');
+        Route::get('/downloadImages', [AdminController::class, 'downloadImages'])->name('downloadImages');
+    });
 
 
-
-// Codes written below will be removed
-
-Route::get('/sendSms', function(){
-    return view('dashboard.test');
+    // Test route for getting data from database
+    Route::get('/data-to-parents', function(){
+        return new ParentResourceCollection(Student::all());
+    });
 });
