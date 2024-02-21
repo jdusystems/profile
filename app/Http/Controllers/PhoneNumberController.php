@@ -29,6 +29,7 @@ class PhoneNumberController extends Controller
             ]
         );
 
+
         // Replace this with your actual JSON payload
         // Phone number should be 998999905518 this kind of format
         $jsonPayload = '{
@@ -45,7 +46,6 @@ class PhoneNumberController extends Controller
                 }
             ]
         }';
-
         // Replace these values with your actual authentication credentials and post data
         $username = env('SMS_CLIENT_USERNAME');
         $password = env('SMS_CLIENT_PASSWORD');
@@ -103,7 +103,7 @@ class PhoneNumberController extends Controller
                     $student->phone_number = $request->phoneNumber;
                 }
                 $student->save();
-                // Removing row from phone_numbers table 
+                // Removing row from phone_numbers table
                 PhoneNumber::where('phone_number', $request->phoneNumber)->delete();
 
                 return response()->json(['status' => 'success', 'message' => 'Telefon raqami tasdiqlandi!'], 200);

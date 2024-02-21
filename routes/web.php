@@ -35,7 +35,7 @@ require __DIR__.'/auth.php';
 Route::middleware('auth')->group(function () {
     Route::get('/', function(){
         return view('dashboard.index');
-    });
+    })->name('index');
     Route::resource('/students', StudentController::class);
     Route::post('/students/image', [StudentController::class, 'imageUpload'])->name('students.imageUpload');
 

@@ -31,8 +31,7 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="#">Asosiy</a></li>
-                            <li class="breadcrumb-item"><a href="#">Talaba</a></li>
+                            <li class="breadcrumb-item"><a href="{{route('index')}}">Asosiy</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Talaba sahifasi</li>
                         </ol>
                     </nav>
@@ -338,7 +337,7 @@
                         icon: "error",
                         title: "Tasdiqlash kodi noto'g'ri"
                     });
-                    
+
                 });
 
         })
